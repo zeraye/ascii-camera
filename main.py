@@ -5,7 +5,6 @@ from PIL import Image
 import numpy as np
 import numpy.typing as npt
 
-# constants
 MIN_GRAYSCALE = 0
 MAX_GRAYSCALE = 255
 
