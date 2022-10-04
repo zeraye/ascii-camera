@@ -9,14 +9,9 @@ import numpy.typing as npt
 MIN_GRAYSCALE = 0
 MAX_GRAYSCALE = 255
 
-# parameters
-FPS = 30
-HEIGHT = 120  # should be dividable by 3
-WIDTH = int(HEIGHT * (4 / 3))
-IMG_SIZE = (HEIGHT, WIDTH)
 
 
-def grayscale_to_ascii(grayscale: np.uint8) -> str:
+def grayscale_to_ascii(grayscale: np.uint8, widen: int) -> str:
     """
     Transform grayscale value to ASCII character.
     """
@@ -26,7 +21,7 @@ def grayscale_to_ascii(grayscale: np.uint8) -> str:
     if MAX_GRAYSCALE >= grayscale >= MIN_GRAYSCALE:
         index: int = int(grayscale // (MAX_GRAYSCALE / (len(grayscale_levels) - 1)))
         # char is multiplied by 3 to widen image
-        char = grayscale_levels[index] * 3
+        char = grayscale_levels[index] * widen
     else:
         raise ValueError(
             f"ERROR: Invalid value for grayscale {grayscale}. Value should be an integer between {MIN_GRAYSCALE}-{MAX_GRAYSCALE}."
@@ -60,11 +55,13 @@ def print_ascii_frame(ascii_frame: str) -> None:
     print(ascii_frame)
 
 
-def camera(img_size: tuple, fps: int) -> None:
+def camera(fps: int = 30, height: int = 30, widen: int = 3) -> None:
     """
     Handle camera video capturing.
     """
     camera = cv2.VideoCapture(0)
+
+    width = int(height * (4 / 3))
 
     while True:
         start: float = time.time()
@@ -76,9 +73,7 @@ def camera(img_size: tuple, fps: int) -> None:
         if not success:
             break
 
-        gray_image: Image = Image.fromarray(frame).convert("L").resize(img_size)
-        gray_frame: npt.NDArray[np.uint8] = np.array(gray_image)
-        ascii_frame: npt.NDArray[np.string_] = frame_to_ascii_frame(gray_frame)
+        gray_image: Image = Image.fromarray(frame).convert("L").resize((width, height))
 
         print_ascii_frame(ascii_frame)
 
@@ -91,4 +86,4 @@ def camera(img_size: tuple, fps: int) -> None:
 
 
 if __name__ == "__main__":
-    camera(IMG_SIZE, FPS)
+    camera()
