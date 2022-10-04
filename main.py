@@ -1,6 +1,7 @@
 import os
 import cv2
 import time
+import re
 from PIL import Image
 import numpy as np
 import numpy.typing as npt
@@ -9,7 +10,7 @@ MIN_GRAYSCALE = 0
 MAX_GRAYSCALE = 255
 
 
-
+@np.vectorize
 def grayscale_to_ascii(grayscale: np.uint8, widen: int) -> str:
     """
     Transform grayscale value to ASCII character.
@@ -29,29 +30,14 @@ def grayscale_to_ascii(grayscale: np.uint8, widen: int) -> str:
     return char
 
 
-def frame_to_ascii_frame(frame: npt.NDArray[np.uint8]) -> str:
+def print_ascii_string(ascii_string: str) -> None:
     """
-    Create a new string of ASCII characters from cv2 frame.
-    """
-    shape: tuple = frame.shape
-    ascii_string: str = ""
-
-    for i in range(shape[0]):
-        for j in range(shape[1]):
-            ascii_string += grayscale_to_ascii(frame[i][j])
-        ascii_string += "\n"
-
-    return ascii_string
-
-
-def print_ascii_frame(ascii_frame: str) -> None:
-    """
-    Clear terminal and print ASCII frame on it.
+    Clear terminal and print ASCII string on it.
     """
     # os-way to clear terminal
     # see: https://stackoverflow.com/a/2084628
     os.system("cls" if os.name == "nt" else "clear")
-    print(ascii_frame)
+    print(ascii_string)
 
 
 def camera(fps: int = 30, height: int = 30, widen: int = 3) -> None:
@@ -73,8 +59,18 @@ def camera(fps: int = 30, height: int = 30, widen: int = 3) -> None:
             break
 
         gray_image: Image = Image.fromarray(frame).convert("L").resize((width, height))
+        gray_frame: npt.NDArray[np.string_] = grayscale_to_ascii(
+            np.array(gray_image), widen
+        )
 
-        print_ascii_frame(ascii_frame)
+        ascii_frame: str = gray_frame.tobytes().decode("utf32")
+
+        # add newline every height * widen chars
+        ascii_string: str = re.sub(
+            "(.{%d})" % (width * widen), "\\1\n", ascii_frame, 0, re.DOTALL
+        )
+
+        print_ascii_string(ascii_string)
 
         diff: float = start - time.time()
 
