@@ -3,7 +3,7 @@ import cv2
 import time
 from PIL import Image
 import numpy as np
-from numpy.typing import npt
+import numpy.typing as npt
 
 # constants
 MIN_GRAYSCALE = 0
