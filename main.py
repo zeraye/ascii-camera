@@ -20,7 +20,7 @@ def grayscale_to_ascii(grayscale: np.uint8, widen: int) -> str:
 
     if MAX_GRAYSCALE >= grayscale >= MIN_GRAYSCALE:
         index: int = int(grayscale // (MAX_GRAYSCALE / (len(grayscale_levels) - 1)))
-        # char is multiplied by 3 to widen image
+        # char is multiplied by `widen` to widen image
         char = grayscale_levels[index] * widen
     else:
         raise ValueError(
@@ -81,4 +81,4 @@ def camera(fps: int = 30, height: int = 30, widen: int = 3) -> None:
 
 
 if __name__ == "__main__":
-    camera()
+    camera(height=150)
